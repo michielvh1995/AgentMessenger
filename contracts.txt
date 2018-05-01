@@ -1,0 +1,10 @@
+Contract:
+{
+  Contractor: {}
+==========================
+  Goal: {}
+  Resources: {}
+
+  Deadline: {}
+  Dependencies: {}
+}
