@@ -3,8 +3,7 @@ import ast
 import Queue
 
 import message as Mess
-from messageHandler import MessageHandler
-#from message import Confirm
+
 from threading import Thread
 
 # App Ralph Horn over factorio automation
@@ -15,11 +14,6 @@ class Messenger:
         self.messages = Queue.Queue()
         self.obj = owner
         self.IP = IP;
-
-        # For parsing and responding to messages
-        if handler:
-            self.handler = handler
-            self.handler.SetOwner(self)
 
         # Initiate the port
         self.setSocket()
@@ -70,8 +64,7 @@ class Messenger:
             while(True):
                 msg = conn.recv(1024)
 
-                mess = self.handler.Parse(msg)
-                # self.handler.HandleMessage(msg, conn)
+                mess = Mess.Parse(msg)
 
                 # Add the message to the queue
                 self.messages.put(mess, block=True, timeout=None)
@@ -113,15 +106,18 @@ class Messenger:
         print "Exit thread"
 
     def SendMessage(self, ExtIP, ExtPort, Message):
-        """Sends a message to an external"""
+        """
+            Unfinished function to send messages to an external
+
+            TODO: Expand this function
+        """
         self.sock.connect((ExtIP, ExtPort))
 
         print "\nConnected"
         self.sock.send(str(Message))
 
         data = self.sock.recv(1024)
-        mess = self.handler.Parse(data)
-        # self.handler.HandleMessage(data, self.sock)
+        mess = Mess.Parse(data)
 
         if mess.keep == '0':
             self.sock.close()

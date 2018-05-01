@@ -1,3 +1,5 @@
+import ast
+
 class Message:
     def __init__(self, msg, type = 0, keepAlive = '1', MLen = 1024):
         # Connection type:
@@ -29,12 +31,22 @@ class Message:
             }
         self.body = {'m' : msg}
 
+
     def __str__(self):
         head = str(self.header)
         body = str(self.body)
 
         s = {'head' : head, 'body': body}
         return str(s)
+
+def Parse(str):
+    """ Parses a message from string to a message """
+    dict = ast.literal_eval(str)
+    head = ast.literal_eval(dict["head"])
+    body = ast.literal_eval(dict["body"])
+
+    return Message(body['m'], type = head['t'], keepAlive = head['c'], MLen = 1024)
+
 
 Confirm = Message("confirm", type = "conf", keepAlive = '0', MLen = 1024)
 Received = Message("received", type = "conf", keepAlive = '0', MLen = 1024)
