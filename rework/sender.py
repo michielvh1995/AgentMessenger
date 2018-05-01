@@ -1,5 +1,4 @@
 import message as Mess
-import messageHandler
 from messenger import Messenger
 
 def CloseConn(data):
@@ -7,10 +6,8 @@ def CloseConn(data):
     print "Connection closed"
 
 port = 5004
-mh = messageHandler.MessageHandler()
-mh.SetKeepAlive(CloseConn)
 
-n = Messenger(port, IP = "127.0.0.1", handler = mh)
+n = Messenger(port, IP = "127.0.0.1")
 print "Initiated at port", port
 
 while(True):
@@ -26,7 +23,7 @@ while(True):
 
     # Send the message and accapt the answer
     data = n.SendMessage("127.0.0.1", 5007, ms)
-    mess = mh.Parse(data)
+    mess = Mess.Parse(data)
 
     print "Message type received:", mess.type
 

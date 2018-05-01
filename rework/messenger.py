@@ -7,49 +7,49 @@ import message as Mess
 from threading import Thread
 
 # App Ralph Horn over factorio automation
-
-class Messenger:
-    def __init__(self, port, owner = None, IP = '127.0.0.1', handler = None):
+class MessengerPrime:
+    def __init__(self, port, IP):
         self.port = port;
-        self.messages = Queue.Queue()
-        self.obj = owner
-        self.IP = IP;
+        self.IP = IP
 
-        # Initiate the port
         self.setSocket()
 
     def setSocket(self):
         self.sock = socket.socket()
         self.sock.bind((self.IP, self.port))
 
+class Sender(MessengerPrime):
+    def SendMessage(self, ExtIP, ExtPort, Message):
+        """
+            Unfinished function to send messages to an external
+
+            TODO: Expand this function
+        """
+        self.sock.connect((ExtIP, ExtPort))
+
+        print "\nConnected"
+        self.sock.send(str(Message))
+
+        data = self.sock.recv(1024)
+        mess = Mess.Parse(data)
+
+        if mess.keep == '0':
+            self.sock.close()
+            self.setSocket()
+
+        return data
+
+class Listener(MessengerPrime):
+    def __init__(self, port, IP):
+        MessengerPrime.__init__(self, port, IP)
+        self.messages = Queue.Queue()
+
     def StartListening(self):
         """ Start the thing itself """
         print "starting thread"
         t = Thread(target = self.listenLoop)   # Thread
-        t.daemon = True
-        t.start()
-
-        t = Thread(target = self.runLoop)   # Thread
         # t.daemon = True
         t.start()
-
-    def runLoop(self):
-        """
-            Perform actions and handle messages when received.
-            If an interesting message pops, open a new connection and reply to it.
-
-            TODO: Move this to the agent class
-        """
-        while True:
-            if not self.messages.empty():
-                a = self.messages.get_nowait()
-                print a
-
-                if a.text == "exit":
-                    break
-
-
-        return False
 
     def listenLoop(self):
         """ Actively listen to messages on the port """
@@ -67,7 +67,7 @@ class Messenger:
                 mess = Mess.Parse(msg)
 
                 # Add the message to the queue
-                self.messages.put(mess, block=True, timeout=None)
+                self.messages.put((ip, mess), block=True, timeout=None)
 
                 # Determine the keep and the related action
                 if not mess.keep:
@@ -105,22 +105,19 @@ class Messenger:
 
         print "Exit thread"
 
+class Messenger:
+    def __init__(self, homePort, sendPort, IP = '127.0.0.1'):
+        self.sender = Sender(sendPort, IP)
+        self.listener = Listener(homePort, IP)
+
     def SendMessage(self, ExtIP, ExtPort, Message):
-        """
-            Unfinished function to send messages to an external
+        self.sender.SendMessage(ExtIP, ExtPort, Message)
 
-            TODO: Expand this function
-        """
-        self.sock.connect((ExtIP, ExtPort))
+    def StartListening(self):
+        self.listener.StartListening()
 
-        print "\nConnected"
-        self.sock.send(str(Message))
+    def empty(self):
+        return self.listener.messages.empty()
 
-        data = self.sock.recv(1024)
-        mess = Mess.Parse(data)
-
-        if mess.keep == '0':
-            self.sock.close()
-            self.setSocket()
-
-        return data
+    def get_nowait(self):
+        return self.listener.messages.get_nowait()
