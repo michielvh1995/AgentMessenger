@@ -66,32 +66,36 @@ class Listener(MessengerPrime):
                 msg = conn.recv(1024)
 
                 mess = Mess.Parse(msg)
+                print mess
 
                 # Add the message to the queue
                 self.messages.put((ip, mess), block=True, timeout=None)
 
                 # Determine the keep and the related action
-                if not mess.keep:
+                if mess.keep == '0':
                     # Keep = 0:
                     #   handle the message and send no reply
                     conn.close()
                     print "Closed connection"
                     break;
 
-                elif mess.keep == 1:
+                elif mess.keep == '1':
                     # Keep = 1:
                     #   Handle the message and send a confirmation
                     conn.send(str(Mess.Received))
                     conn.close()
                     print "Closed connection"
-                    break;
+                    break
 
-                elif mess.keep == 2:
+                elif mess.keep == '2':
                     # Keep = 2:
                     #   Handle the message, send a confirmation
                     #   Keep the connection alive
                     conn.send(str(Mess.Receive2))
                     print "Connection kept alive"
+
+                else:
+                    print mess.keep
 
 
                 # Shutting down
