@@ -27,17 +27,18 @@ class Sender(MessengerPrime):
         """
         self.sock.connect((ExtIP, ExtPort))
 
-        print "\nConnected"
+        print "\n\nConnected"
         self.sock.send(str(Message))
 
-        data = self.sock.recv(1024)
-        mess = Mess.Parse(data)
+        if not Message.keep == '0':
+            data = self.sock.recv(1024)
+            mess = Mess.Parse(data)
 
-        if mess.keep == '0':
+        if not Message.keep == '2':
             self.sock.close()
             self.setSocket()
-
-        return data
+            print 'closed conn'
+        # return data
 
 class Listener(MessengerPrime):
     def __init__(self, port, IP):
@@ -112,6 +113,7 @@ class Messenger:
 
     def SendMessage(self, ExtIP, ExtPort, Message):
         self.sender.SendMessage(ExtIP, ExtPort, Message)
+        print "sent"
 
     def StartListening(self):
         self.listener.StartListening()

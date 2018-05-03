@@ -1,5 +1,5 @@
 import message as Mess
-from messenger import Messenger
+from messenger import Sender
 
 def CloseConn(data):
     data.close()
@@ -7,12 +7,10 @@ def CloseConn(data):
 
 port = 5004
 
-n = Messenger(port, IP = "127.0.0.1")
+n = Sender(port,  IP = "127.0.0.1")
 print "Initiated at port", port
 
 while(True):
-    #ip = input("IP?")
-    #po = input("Port?")
     m = raw_input("Message? \n")
     keep = 1
 

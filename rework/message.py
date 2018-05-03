@@ -1,7 +1,7 @@
 import ast
 
 class Message:
-    def __init__(self, msg, type = 0, keepAlive = '1', MLen = 1024):
+    def __init__(self, msg, type = 0, keepAlive = '1', MLen = 1024, port = 0):
         # Connection type:
         # exit      = end of sending
         # confirm   = Message received, transmission done
@@ -16,6 +16,10 @@ class Message:
 
         self.text = msg
 
+        # The owner's data
+        IP = '127.0.0.1'
+        self.receiver = (IP, port)
+
         # If the message is too long:
         self.count = 0  # the number of messages that will be sent
         self.item = 0   # index of this message in said series
@@ -27,7 +31,8 @@ class Message:
             'i': self.item,
             't': type,
             'c': keepAlive,
-            'l': MLen
+            'l': MLen,
+            'p': port
             }
         self.body = {'m' : msg}
 
